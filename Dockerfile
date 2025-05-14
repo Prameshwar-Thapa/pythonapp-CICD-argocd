@@ -1,11 +1,15 @@
-FROM python:3.10-slim 
+FROM python:3.10-slim
 
 WORKDIR /app
 
-COPY requirements.text .
+# Copy the requirements file
+COPY requirements.txt .
 
-RUN pip install --no-cache-dir -r requirements.text
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy the rest of the application code
 COPY . .
 
-CMD [ "python","app.py" ]
+# Command to run the application
+CMD ["python", "app.py"]
