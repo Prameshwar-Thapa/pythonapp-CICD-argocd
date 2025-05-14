@@ -1,0 +1,49 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        pytest
+
+    - name: Lint
+      run: |
+        pip install flake8
+        flake8 app.py
+
+    - name: Build Docker image
+      run: |
+        docker build -t your-dockerhub-username/python-webapp:latest .
+
+    - name: Push Docker image
+      run: |
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        docker push your-dockerhub-username/python-webapp:latest
+
+    - name: Update Kubernetes deployment YAML
+      run: |
+        sed -i "s|image: .*|image: your-dockerhub-username/python-webapp:latest|" k8s-deployment.yaml
+        git config --global user.name 'Prameshwar-Thapa'
+        git config --global user.email 'thapaprameshwar7@gmail.com'
+        git add k8s-deployment.yaml
+        git commit -m "Update image to latest"
+        git push
