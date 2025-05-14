@@ -19,7 +19,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-         pip install -r ${{ github.workspace }}/requirements.txt
+         pip install -r ${{ github.workspace }}/requirements.text
 
     - name: Run tests
       run: |
